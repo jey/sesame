@@ -10,7 +10,16 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110912061150) do
+ActiveRecord::Schema.define(:version => 20110912224243) do
+
+  create_table "blogs", :force => true do |t|
+    t.string   "name"
+    t.string   "url"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "blogs", ["name"], :name => "index_blogs_on_name", :unique => true
 
   create_table "posts", :force => true do |t|
     t.string   "reblogged_root_url"
@@ -21,6 +30,7 @@ ActiveRecord::Schema.define(:version => 20110912061150) do
     t.string   "timestamp"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "tumblr_id",           :null => false
   end
 
 end

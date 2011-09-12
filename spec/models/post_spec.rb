@@ -7,9 +7,9 @@ describe Post do
       :reblogged_from_name => "middle_man",
       :reblogged_root_name => "source_blog",
       :type => "photo",
-      :note_count => "22",
-      :timestamp => "1311716336",
-      :id => "1"
+      :note_count => 22,
+      :timestamp => 1311716336,
+      :tumblr_id => 12345
     }
   end
   

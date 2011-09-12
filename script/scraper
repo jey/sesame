@@ -1,0 +1,27 @@
+require 'pp'
+require 'lib/tumblr'
+
+INITIAL_BLOG_QUEUE = [
+    'lukegrecki.com',
+    'gastrogirl.tumblr.com',
+]
+
+INITIAL_BLOG_QUEUE.each do |blog_domain|
+  puts "Starting on #{blog_domain}"
+  offset = 0
+  blog = Tumblr.get_blog(blog_domain)
+  while true
+    raw_posts = Tumblr.get_posts(blog_domain, :offset => offset)
+
+    break if raw_posts.empty?
+    puts "I got #{posts.length} entries from #{blog_domain}"
+
+    raw_posts.each do |raw|
+      #post = Post.create! :post_id => raw
+    end
+
+    offset += raw_posts.length
+  end
+  puts
+end
+
