@@ -4,4 +4,4 @@
 
 require File.expand_path('../config/application', __FILE__)
 
-Tumblr2::Application.load_tasks
+Sesame::Application.load_tasks
