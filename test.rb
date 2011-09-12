@@ -8,7 +8,7 @@ class Tumblr
   default_params :api_key => 'kf8Ox3YsSLmWmO720r8kYFx6Weozf1XCwsbFgac0t2ruRfDI7l'
 
   def self.get_post(blog, id)
-    r = unwrap(self.get("/v2/blog/#{blog}/posts", :query => { :id => id, :reblog_info => true, :notes_info => true, :notes_offset => 50 }))
+    r = unwrap(self.get("/v2/blog/#{blog}/posts", :query => { :id => id, :reblog_info => true, :notes_info => true }))
     return r['posts'][0]
   end
 
