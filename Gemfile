@@ -15,7 +15,7 @@ end
 gem 'jquery-rails'
 
 group :development do
-  gem 'annotate-models', '1.0.4'
+  gem 'annotate', :git => 'git://github.com/ctran/annotate_models.git'
   gem 'rspec-rails', '2.5.0'
   gem 'autotest'
 end
