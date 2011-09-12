@@ -1,12 +1,7 @@
 source 'http://rubygems.org'
 
 gem 'rails', '3.1.0'
-
-# Bundle edge Rails instead:
-# gem 'rails',     :git => 'git://github.com/rails/rails.git'
-
 gem 'sqlite3'
-
 gem 'json'
 
 # Gems used only for assets and not required
@@ -19,12 +14,14 @@ end
 
 gem 'jquery-rails'
 
-# Use unicorn as the web server
-# gem 'unicorn'
+group :development do
+  gem 'annotate-models', '1.0.4'
+  gem 'rspec-rails', '2.5.0'
+  gem 'autotest'
+end
 
-# Deploy with Capistrano
-# gem 'capistrano'
+group :test do
+  gem 'rspec', '2.5.0'
+end
 
-# To use debugger
-# gem 'ruby-debug'
 

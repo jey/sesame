@@ -1,0 +1,19 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/Fixtures.html
+
+one:
+  reblogged_root_url: MyString
+  reblogged_from_name: MyString
+  reblogged_root_name: MyString
+  type: 
+  note_count: 1
+  timestamp: MyString
+  id: 1
+
+two:
+  reblogged_root_url: MyString
+  reblogged_from_name: MyString
+  reblogged_root_name: MyString
+  type: 
+  note_count: 1
+  timestamp: MyString
+  id: 1

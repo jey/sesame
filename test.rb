@@ -12,6 +12,11 @@ class Tumblr
     return r['posts'][0]
   end
 
+  def self.get_posts(blog)
+    r = unwrap(self.get("/v2/blog/#{blog}/posts", :query => { :reblog_info => true, :notes_info => true }))
+    return r['posts']
+  end
+
   def self.unwrap(response)
     if response['meta']['status'] == 200
       return response['response']
@@ -34,8 +39,5 @@ def get_nyan
   Tumblr.get_post('sagyehan.tumblr.com', 9966559979)
 end
 
-post = get_nyan
-pp post
-puts
-puts post['notes'].length
+
 
