@@ -10,26 +10,29 @@ INITIAL_BLOG_QUEUE.each do |blog_domain|
   puts "Starting on #{blog_domain}"
   offset = 0
   raw_blog = Tumblr.get_blog(blog_domain)
-  blog = Blog.find_or_create_by_name(raw_blog['name'], :url => raw_blog['url'])
+  blog_name = Blog.canonical_name(raw_blog['name'])
+  blog = Blog.find_or_create_by_name(blog_name, :url => raw_blog['url'])
+
   while true
     raw_posts = Tumblr.get_posts(blog_domain, :offset => offset)
-
     break if raw_posts.empty?
     puts "I got #{raw_posts.length} entries from #{blog_domain}"
-
     raw_posts.each do |raw|
+     begin
       tumblr_id = raw["id"]
-      timestamp = raw["timestamp"]
-      url = raw["post_url"]
       root_post_id = nil
 
       if raw["reblogged_root_name"]
-        root_blog = Blog.find_or_create_by_name(raw['reblogged_root_name'])
-        # If the tumblr post ID isn't provided, parse it from the URL
-        root_tumblr_id = URI.parse(raw['reblogged_root_url']).path[%r{/post/(\d+)($|/)}, 1]
+        root_blog_name = Blog.canonical_name(raw['reblogged_root_name'])
+        root_blog = Blog.find_or_create_by_name(root_blog_name)
+        root_blog.save!
+        # The tumblr post ID isn't provided, so parse it from the URL
+        root_post_url = raw['reblogged_root_url'].sub(%r{-deactivated\d+-?.tumblr.com}, '.tumblr.com')
+        root_tumblr_id = URI.parse(root_post_url).path[%r{/post/(\d+)($|/)}, 1]
         root_post = Post.find_or_create_by_blog_id_and_tumblr_id(
                       root_blog.id,
                       root_tumblr_id,
+                      :url => raw['reblogged_root_url'],
                       :reblogged_root_post_id => 0)
         root_post.save!
         root_post_id = root_post.id
@@ -37,14 +40,18 @@ INITIAL_BLOG_QUEUE.each do |blog_domain|
         # A root post id of 0 indicates that this post is its own root.
         root_post_id = 0
       end
-      
+
       post = Post.find_or_create_by_blog_id_and_tumblr_id(
                 blog.id,
                 tumblr_id,
-                :timestamp => timestamp,
-                :url => url,
-                :reblogged_root_post_id => root_post_id
-            )
+                :timestamp => raw['timestamp'],
+                :url => raw['post_url'],
+                :reblogged_root_post_id => root_post_id)
+      post.save!
+     rescue
+      pp raw
+      raise
+     end
     end
 
     offset += raw_posts.length
