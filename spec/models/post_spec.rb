@@ -3,28 +3,25 @@ require 'spec_helper'
 describe Post do
   before(:each) do
     @attr = {
-      :reblogged_root_url => "http://blog.tumblr.com/post/id/post-name",
-      :reblogged_from_name => "middle_blog",
-      :reblogged_root_name => "source_blog",
+      :reblogged_root_post_id => 0,
       :type => "photo",
       :note_count => 22,
       :timestamp => 1311716336,
-      :tumblr_id => 12345
+      :tumblr_id => 12345,
+      :url => "http://bloggy.tumblr.com/id/name"
     }
   end
   
-  it "should create an instance with valid attributes" do
-    Post.create!(@attr)
-  end
+  it "should create an instance with valid attributes"
   
   it "should require a tumblr_id" do
     idless_post = Post.new(@attr.merge(:tumblr_id => ""))
     idless_post.should_not be_valid
   end
-  
-  it "should require a reblogged_root_name" do
-    rootnameless_post = Post.new(@attr.merge(:reblogged_root_name => ""))
-    rootnameless_post.should_not be_valid
+
+  it "should require a url" do
+    urlless_post = Post.new(@attr.merge(:url => ""))
+    urlless_post.should_not be_valid
   end
   
   it "should require a timestamp" do
@@ -35,11 +32,17 @@ describe Post do
   describe "blog association" do
     before(:each) do
       @blog = Blog.create({ :name => "blog_name", :url => "bloggy.tumblr.com" })
-      @post = Post.create(@attr)
+      @post = @blog.posts.create(@attr)
     end
     
-    it "should belong to a blog" do
-      @post.should respond_to(:blog)
+    it "should belong to a valid blog"
+  end
+  
+  describe "post association" do
+    before(:each) do
+      @blog = Blog.create({ :name => "blog_name", :url => "bloggy.tumblr.com" })
     end
+    
+    it "should require a reblogged_root_post_id"
   end
 end
