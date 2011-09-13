@@ -3,7 +3,7 @@ require 'lib/tumblr'
 
 INITIAL_BLOG_QUEUE = [
     'lukegrecki.com',
-    'gastrogirl.tumblr.com',
+    'gastrogirl.tumblr.com'
 ]
 
 INITIAL_BLOG_QUEUE.each do |blog_domain|
