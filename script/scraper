@@ -16,13 +16,17 @@ INITIAL_BLOG_QUEUE.each do |blog_domain|
   while true
     raw_posts = Tumblr.get_posts(blog_domain, :offset => offset)
     break if raw_posts.empty?
-    puts "I got #{raw_posts.length} entries from #{blog_domain}"
+    puts "(#{raw_posts.length} entries from #{blog_domain}, #{Post.count} posts scraped"
     raw_posts.each do |raw|
      begin
       tumblr_id = raw["id"]
       root_post_id = nil
 
-      if raw["reblogged_root_name"]
+      if raw["reblogged_root_name"] == ""
+        # This must be reblogged from a private blog.
+        puts "skipping private root (#{blog_name}, #{tumblr_id}) with #{raw['note_count']} notes"
+        next
+      elsif raw['reblogged_root_name']
         root_blog_name = Blog.canonical_name(raw['reblogged_root_name'])
         root_blog = Blog.find_or_create_by_name(root_blog_name)
         root_blog.save!

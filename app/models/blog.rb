@@ -1,4 +1,6 @@
 class Blog < ActiveRecord::Base
+# An id of 0 refers to an unspecified private blog.
+
   validates_presence_of :name
 #  validates_presence_of :url
   validates_uniqueness_of :name
