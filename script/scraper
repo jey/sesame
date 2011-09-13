@@ -9,7 +9,8 @@ INITIAL_BLOG_QUEUE = [
 INITIAL_BLOG_QUEUE.each do |blog_domain|
   puts "Starting on #{blog_domain}"
   offset = 0
-  blog = Tumblr.get_blog(blog_domain)
+  raw_blog = Tumblr.get_blog(blog_domain)
+  blog = Blog.find_or_create_by_name(raw_blog['name'], :url => raw_blog['url'])
   while true
     raw_posts = Tumblr.get_posts(blog_domain, :offset => offset)
 
@@ -17,7 +18,33 @@ INITIAL_BLOG_QUEUE.each do |blog_domain|
     puts "I got #{raw_posts.length} entries from #{blog_domain}"
 
     raw_posts.each do |raw|
-      #post = Post.create! :post_id => raw
+      tumblr_id = raw["id"]
+      timestamp = raw["timestamp"]
+      url = raw["post_url"]
+      root_post_id = nil
+
+      if raw["reblogged_root_name"]
+        root_blog = Blog.find_or_create_by_name(raw['reblogged_root_name'])
+        # If the tumblr post ID isn't provided, parse it from the URL
+        root_tumblr_id = URI.parse(raw['reblogged_root_url']).path[%r{/post/(\d+)($|/)}, 1]
+        root_post = Post.find_or_create_by_blog_id_and_tumblr_id(
+                      root_blog,
+                      root_tumblr_id,
+                      :reblogged_root_post_id => 0)
+        root_post.save!
+        root_post_id = root_post.id
+        raise "wtf" if root_post_id.nil?
+      else
+        # A root post id of 0 indicates that this post is its own root.
+        root_post_id = 0
+      end
+      raise "wtf2" if root_post_id.nil?
+      
+      post = Post.find_or_create_by_blog_id_and_tumblr_id(blog, tumblr_id,
+                :timestamp => timestamp,
+                :url => url,
+                :reblogged_root_post_id => root_post_id
+            )
     end
 
     offset += raw_posts.length
