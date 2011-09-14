@@ -16,7 +16,8 @@ INITIAL_BLOG_QUEUE.each do |blog_domain|
   while true
     raw_posts = Tumblr.get_posts(blog_domain, :offset => offset)
     break if raw_posts.empty?
-    puts "(#{raw_posts.length} entries from #{blog_domain}, #{Post.count} posts scraped"
+    uniques = Post.find_all_by_reblogged_root_post_id(0).count
+    puts "(#{raw_posts.length} entries from #{blog_domain}, #{Post.count} posts scraped with #{uniques} uniques)"
     raw_posts.each do |raw|
      begin
       tumblr_id = raw["id"]
@@ -32,7 +33,7 @@ INITIAL_BLOG_QUEUE.each do |blog_domain|
         root_blog.save!
         # The tumblr post ID isn't provided, so parse it from the URL
         root_post_url = raw['reblogged_root_url'].sub(%r{-deactivated\d+-?.tumblr.com}, '.tumblr.com')
-        root_tumblr_id = URI.parse(root_post_url).path[%r{/post/(\d+)($|/)}, 1]
+        root_tumblr_id = root_post_url[%r{/post/(\d+)($|/)}, 1]
         root_post = Post.find_or_create_by_blog_id_and_tumblr_id(
                       root_blog.id,
                       root_tumblr_id,
@@ -52,6 +53,32 @@ INITIAL_BLOG_QUEUE.each do |blog_domain|
                 :url => raw['post_url'],
                 :reblogged_root_post_id => root_post_id)
       post.save!
+
+      # Handle notes
+      root_post_id = post.id if root_post_id == 0
+      raw['notes'] ||= []
+      raw['notes'].each do |note|
+        if note['type'] == 'reblog'
+          note_blog_name = Blog.canonical_name(note['blog_name'])
+          note_blog = Blog.find_or_create_by_name(note_blog_name, :url => note['blog_url'])
+          note_blog.save!
+          note_post = Post.find_or_create_by_blog_id_and_reblogged_root_post_id(
+                        note_blog.id, 
+                        root_post_id)
+          note_post.save!
+        elsif note['type'] == 'like'
+          # Currently unhandled
+        elsif note['type'] == 'posted'
+          # Currently unhandled
+        elsif note['type'] == 'note_model'
+          # Currently unhandled
+        elsif not note['type'].nil?
+          puts "Unhandled note type #{note['type']}"
+          pp note
+          raise "Wha?"
+          # $stderr.puts "Unhandled note type #{note['type']}"
+        end
+      end
      rescue
       pp raw
       raise

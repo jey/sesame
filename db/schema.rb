@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110913044230) do
+ActiveRecord::Schema.define(:version => 20110913233924) do
 
   create_table "blogs", :force => true do |t|
     t.string   "name"
@@ -27,7 +27,7 @@ ActiveRecord::Schema.define(:version => 20110913044230) do
     t.string   "timestamp"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "tumblr_id",              :limit => 8, :null => false
+    t.integer  "tumblr_id",              :limit => 8
     t.integer  "blog_id"
     t.integer  "reblogged_root_post_id",              :null => false
     t.integer  "reblogged_from_post_id"
