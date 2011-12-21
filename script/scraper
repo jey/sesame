@@ -63,7 +63,7 @@ INITIAL_BLOG_QUEUE.each do |blog_domain|
           note_blog = Blog.find_or_create_by_name(note_blog_name, :url => note['blog_url'])
           note_blog.save!
           note_post = Post.find_or_create_by_blog_id_and_reblogged_root_post_id(
-                        note_blog.id, 
+                        note_blog.id,
                         root_post_id)
           note_post.save!
         elsif note['type'] == 'like'
